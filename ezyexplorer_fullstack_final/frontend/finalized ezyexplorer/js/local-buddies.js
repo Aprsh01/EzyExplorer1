@@ -140,14 +140,56 @@
   window.loadLocalBuddies = loadBuddies;
 
   // Handle booking
-  function handleBooking(buddyName) {
-    showNotificationPopup(
-      'Booking Request Sent!',
-      `Your booking request for <strong>${buddyName}</strong> has been sent successfully.<br><br>You will be contacted shortly to confirm your trip details.`,
-      'info'
-    );
-    // Here you can add more sophisticated booking logic
-    // like opening a booking form, sending to backend, etc.
+  async function handleBooking(buddyName) {
+    const button = event.target.closest('.btn-book-buddy');
+    const originalText = button.innerHTML;
+    
+    try {
+      // Find buddy data
+      const buddy = localBuddies.find(b => b.name === buddyName);
+      
+      // Disable button and show loading
+      button.disabled = true;
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Booking...';
+      
+      // Check if bookLocalBuddy function exists (from api.js)
+      if (typeof bookLocalBuddy === 'function') {
+        // Call API to create booking and notification
+        const result = await bookLocalBuddy({
+          buddyName: buddyName,
+          specialty: buddy ? buddy.specialty : 'Tour Guide',
+          perHourCharge: buddy ? buddy.perHourCharge : 500
+        });
+        
+        console.log('Booking created:', result);
+        
+        // Show success message
+        showNotificationPopup(
+          'Booking Request Sent!',
+          `Your booking request for <strong>${buddyName}</strong> has been sent successfully.<br><br>You will be contacted shortly to confirm your trip details.`,
+          'info'
+        );
+      } else {
+        // Fallback if API is not available
+        console.warn('API not available, showing notification only');
+        showNotificationPopup(
+          'Booking Request Sent!',
+          `Your booking request for <strong>${buddyName}</strong> has been sent successfully.<br><br>You will be contacted shortly to confirm your trip details.`,
+          'info'
+        );
+      }
+    } catch (error) {
+      console.error('Error booking buddy:', error);
+      showNotificationPopup(
+        'Booking Failed',
+        'There was an error processing your booking. Please try again.',
+        'error'
+      );
+    } finally {
+      // Re-enable button
+      button.disabled = false;
+      button.innerHTML = originalText;
+    }
   }
 
   // Function to open modal (exposed globally)

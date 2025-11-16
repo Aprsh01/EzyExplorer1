@@ -148,7 +148,7 @@ class WishlistManager {
         this.wishlistCount = document.getElementById('wishlist-count');
         this.wishlistItems = document.getElementById('wishlist-items');
         this.wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-        this.API_URL = 'http://localhost:5000/api/wishlist';
+        this.API_URL = 'http://localhost:9000/api/wishlist';
         this.userId = 'guest'; // Can be updated with actual user ID from auth
         this.init();
     }

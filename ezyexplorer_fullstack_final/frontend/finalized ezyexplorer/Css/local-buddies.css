@@ -1,12 +1,13 @@
 /* Local Buddies Modal Styles */
 #local-buddies-modal {
-  z-index: 9999 !important;
+  z-index: 100000 !important;
 }
 
 .local-buddies-modal-content {
   max-width: 900px;
   width: 95%;
-  z-index: 10000;
+  z-index: 100001 !important;
+  position: relative;
 }
 
 .local-buddies-grid {

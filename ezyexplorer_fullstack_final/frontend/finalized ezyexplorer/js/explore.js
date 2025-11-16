@@ -387,7 +387,7 @@ class ExploreManager {
                     
                     console.log('Saving visit:', { destination: destinationName, selectedDate, userId });
                     
-                    const response = await fetch('http://localhost:5000/api/visit', {
+                    const response = await fetch('http://localhost:9000/api/visit', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

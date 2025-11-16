@@ -1,7 +1,8 @@
 // API Configuration and Helper Functions
 // Place this in: frontend/finalized ezyexplorer/js/api.js
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// API Configuration
+const API_BASE_URL = 'http://localhost:9000/api';
 
 // Helper function to get userId (from localStorage or generate guest ID)
 function getUserId() {
@@ -322,6 +323,128 @@ async function addMemberToGroup(groupId, memberData) {
 }
 
 // ==========================
+// BOOKINGS API
+// ==========================
+
+// Create a booking
+async function createBooking(bookingData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/bookings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: getUserId(),
+        ...bookingData
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to create booking');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating booking:', error);
+    throw error;
+  }
+}
+
+// Get user bookings
+async function getUserBookings() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/bookings?userId=${getUserId()}`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+    throw error;
+  }
+}
+
+// ==========================
+// NOTIFICATIONS API
+// ==========================
+
+// Create a notification
+async function createNotification(notificationData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/notifications`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: getUserId(),
+        ...notificationData
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to create notification');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating notification:', error);
+    throw error;
+  }
+}
+
+// Get user notifications
+async function getUserNotifications(unreadOnly = false) {
+  try {
+    const url = `${API_BASE_URL}/notifications/${getUserId()}${unreadOnly ? '?unreadOnly=true' : ''}`;
+    const response = await fetch(url);
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    throw error;
+  }
+}
+
+// Mark notification as read
+async function markNotificationAsRead(notificationId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/notifications/${notificationId}/read`, {
+      method: 'PATCH'
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+    throw error;
+  }
+}
+
+// ==========================
+// LOCAL BUDDIES API
+// ==========================
+
+// Book a local buddy
+async function bookLocalBuddy(buddyData) {
+  try {
+    // Create booking
+    const booking = await createBooking({
+      type: 'buddy',
+      buddyName: buddyData.buddyName,
+      buddySpecialty: buddyData.specialty,
+      date: buddyData.date || new Date().toISOString(),
+      duration: buddyData.duration || '4 hours',
+      status: 'pending'
+    });
+    
+    // Create notification
+    await createNotification({
+      type: 'buddy',
+      title: 'Booking Request Sent!',
+      message: `Your booking request for ${buddyData.buddyName} has been sent successfully. You will be contacted shortly to confirm your trip details.`,
+      link: `/bookings/${booking.booking._id}`
+    });
+    
+    return { booking, success: true };
+  } catch (error) {
+    console.error('Error booking buddy:', error);
+    throw error;
+  }
+}
+
+// ==========================
 // EXAMPLE USAGE
 // ==========================
 
@@ -407,6 +530,27 @@ export {
   calculateSplit,
   addMemberToGroup,
   
+  // Bookings
+  createBooking,
+  getUserBookings,
+  
+  // Notifications
+  createNotification,
+  getUserNotifications,
+  markNotificationAsRead,
+  
+  // Local Buddies
+  bookLocalBuddy,
+  
   // Helpers
   getUserId
 };
+
+// Also expose functions globally for non-module usage
+if (typeof window !== 'undefined') {
+  window.bookLocalBuddy = bookLocalBuddy;
+  window.createBooking = createBooking;
+  window.createNotification = createNotification;
+  window.getUserNotifications = getUserNotifications;
+  window.getUserId = getUserId;
+}

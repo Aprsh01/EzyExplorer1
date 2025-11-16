@@ -8,7 +8,7 @@ class AuthManager {
         this.authTabs = document.querySelectorAll('.auth-tab');
         this.loginForm = document.getElementById('login-form');
         this.signupForm = document.getElementById('signup-form');
-        this.API_URL = 'http://localhost:5000/api/auth';
+        this.API_URL = 'http://localhost:9000/api/auth';
         
         // Bind the click handler so we can remove/add it
         this.handleLoginBtnClick = this.handleLoginBtnClick.bind(this);
@@ -162,19 +162,29 @@ class AuthManager {
             },
             body: JSON.stringify({ email, password, rememberMe })
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(response => {
+            // Parse JSON regardless of status code
+            return response.json().then(data => ({
+                ok: response.ok,
+                status: response.status,
+                data: data
+            }));
+        })
+        .then(result => {
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
             
-            if (data.success) {
+            if (result.ok && result.data.success) {
                 // Store token and user data
-                localStorage.setItem('authToken', data.token);
-                localStorage.setItem('userData', JSON.stringify(data.user));
+                localStorage.setItem('authToken', result.data.token);
+                localStorage.setItem('userData', JSON.stringify(result.data.user));
                 
                 if (rememberMe) {
                     localStorage.setItem('rememberMe', 'true');
                 }
+                
+                // Hide error message if visible
+                document.getElementById('login-error-message').style.display = 'none';
                 
                 // Show success message
                 this.showSuccessMessage('Login successful! Welcome back.');
@@ -183,16 +193,16 @@ class AuthManager {
                 this.hideLoginModal();
                 
                 // Update login button
-                this.updateLoginButton(true, data.user.name, data.user.email);
+                this.updateLoginButton(true, result.data.user.name, result.data.user.email);
             } else {
-                this.showErrorMessage(data.error || 'Login failed. Please try again.');
+                this.showInlineError('login', result.data.error || result.data.message || 'Login failed. Please try again.');
             }
         })
         .catch(error => {
             console.error('Login error:', error);
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
-            this.showErrorMessage('Connection error. Please try again.');
+            this.showInlineError('login', 'Connection error. Please try again.');
         });
     }
     
@@ -222,15 +232,25 @@ class AuthManager {
             },
             body: JSON.stringify({ name, email, password, phone })
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(response => {
+            // Parse JSON regardless of status code
+            return response.json().then(data => ({
+                ok: response.ok,
+                status: response.status,
+                data: data
+            }));
+        })
+        .then(result => {
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
             
-            if (data.success) {
+            if (result.ok && result.data.success) {
                 // Store token and user data
-                localStorage.setItem('authToken', data.token);
-                localStorage.setItem('userData', JSON.stringify(data.user));
+                localStorage.setItem('authToken', result.data.token);
+                localStorage.setItem('userData', JSON.stringify(result.data.user));
+                
+                // Hide error message if visible
+                document.getElementById('signup-error-message').style.display = 'none';
                 
                 // Show success message
                 this.showSuccessMessage('Account created successfully! Welcome to EzyExplorer.');
@@ -239,16 +259,16 @@ class AuthManager {
                 this.hideLoginModal();
                 
                 // Update login button
-                this.updateLoginButton(true, data.user.name, data.user.email);
+                this.updateLoginButton(true, result.data.user.name, result.data.user.email);
             } else {
-                this.showErrorMessage(data.error || 'Signup failed. Please try again.');
+                this.showInlineError('signup', result.data.error || result.data.message || 'Signup failed. Please try again.');
             }
         })
         .catch(error => {
             console.error('Signup error:', error);
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
-            this.showErrorMessage('Connection error. Please try again.');
+            this.showInlineError('signup', 'Connection error. Please try again.');
         });
     }
     
@@ -362,6 +382,21 @@ class AuthManager {
                 notification.remove();
             }, 300);
         }, 3000);
+    }
+    
+    showInlineError(formType, message) {
+        const errorDiv = document.getElementById(`${formType}-error-message`);
+        const errorText = document.getElementById(`${formType}-error-text`);
+        
+        if (errorDiv && errorText) {
+            errorText.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
     }
     
     showErrorMessage(message) {

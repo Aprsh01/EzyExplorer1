@@ -1093,7 +1093,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: var(--z-modal);
+  z-index: 10000;
   opacity: 0;
   visibility: hidden;
   transition: all var(--transition-normal);
