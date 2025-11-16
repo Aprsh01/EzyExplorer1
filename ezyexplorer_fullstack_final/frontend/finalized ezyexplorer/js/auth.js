@@ -45,7 +45,11 @@ class AuthManager {
     
     setupEventListeners() {
         // Login button click - dynamically handled based on auth state
-        this.loginBtn.addEventListener('click', this.handleLoginBtnClick);
+        if (this.loginBtn) {
+            this.loginBtn.addEventListener('click', this.handleLoginBtnClick);
+        } else {
+            console.error('Login button not found!');
+        }
         
         // Modal close button
         this.modalClose.addEventListener('click', () => {
@@ -97,15 +101,19 @@ class AuthManager {
     }
     
     showLoginModal() {
+        console.log('showLoginModal called, modal element:', this.loginModal);
         if (this.loginModal) {
             this.loginModal.classList.add('active');
             document.body.style.overflow = 'hidden';
+            console.log('Modal should be visible now');
             
             // Focus on first input
             const firstInput = this.loginModal.querySelector('input');
             if (firstInput) {
                 setTimeout(() => firstInput.focus(), 100);
             }
+        } else {
+            console.error('Login modal element not found!');
         }
     }
     
@@ -186,9 +194,6 @@ class AuthManager {
                 // Hide error message if visible
                 document.getElementById('login-error-message').style.display = 'none';
                 
-                // Show success message
-                this.showSuccessMessage('Login successful! Welcome back.');
-                
                 // Hide modal
                 this.hideLoginModal();
                 
@@ -251,9 +256,6 @@ class AuthManager {
                 
                 // Hide error message if visible
                 document.getElementById('signup-error-message').style.display = 'none';
-                
-                // Show success message
-                this.showSuccessMessage('Account created successfully! Welcome to EzyExplorer.');
                 
                 // Hide modal
                 this.hideLoginModal();
@@ -549,7 +551,6 @@ class AuthManager {
         
         // Update UI
         this.updateLoginButton(false);
-        this.showSuccessMessage('You have been logged out successfully.');
     }
 }
 

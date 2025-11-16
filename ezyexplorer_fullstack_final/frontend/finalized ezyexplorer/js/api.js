@@ -419,25 +419,56 @@ async function markNotificationAsRead(notificationId) {
 // Book a local buddy
 async function bookLocalBuddy(buddyData) {
   try {
-    // Create booking
-    const booking = await createBooking({
-      type: 'buddy',
-      buddyName: buddyData.buddyName,
-      buddySpecialty: buddyData.specialty,
-      date: buddyData.date || new Date().toISOString(),
-      duration: buddyData.duration || '4 hours',
-      status: 'pending'
+    const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Please login to book a buddy');
+    }
+
+    // First, find the buddy by name from the buddies API
+    const buddiesResponse = await fetch(`${API_BASE_URL}/buddies?search=${encodeURIComponent(buddyData.buddyName)}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
+    const buddiesData = await buddiesResponse.json();
+    
+    let buddyId = null;
+    if (buddiesData.buddies && buddiesData.buddies.length > 0) {
+      buddyId = buddiesData.buddies[0]._id;
+    }
+
+    // Create buddy booking with the new API
+    const response = await fetch(`${API_BASE_URL}/buddy-bookings`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        buddyId: buddyId,
+        bookingDate: buddyData.date || new Date().toISOString(),
+        duration: buddyData.duration || 4, // hours as number
+        meetingPoint: buddyData.meetingPoint || 'To be confirmed',
+        specialRequests: buddyData.specialRequests || ''
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to book buddy');
+    }
+
+    const result = await response.json();
     
     // Create notification
     await createNotification({
       type: 'buddy',
       title: 'Booking Request Sent!',
       message: `Your booking request for ${buddyData.buddyName} has been sent successfully. You will be contacted shortly to confirm your trip details.`,
-      link: `/bookings/${booking.booking._id}`
+      link: `/bookings`
     });
     
-    return { booking, success: true };
+    return { booking: result.booking, success: true };
   } catch (error) {
     console.error('Error booking buddy:', error);
     throw error;

@@ -96,6 +96,19 @@ class CommentsManager {
   }
 
   addComment() {
+    // Check if user is logged in
+    const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+    if (!token || token === 'null' || token === 'undefined') {
+      if (window.showNotificationPopup) {
+        window.showNotificationPopup(
+          'Login Required',
+          'Please login to post a comment.',
+          'info'
+        );
+      }
+      return;
+    }
+    
     const nameInput = document.getElementById('comment-name');
     const textInput = document.getElementById('comment-text');
 

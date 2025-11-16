@@ -668,6 +668,20 @@ class ExploreManager {
             if (planBtn) {
                 planBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
+                    
+                    // Check if user is logged in
+                    const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+                    if (!token || token === 'null' || token === 'undefined') {
+                        if (window.showNotificationPopup) {
+                            window.showNotificationPopup(
+                                'Login Required',
+                                'Please login to plan your visit.',
+                                'info'
+                            );
+                        }
+                        return;
+                    }
+                    
                     showPlanPopup();
                 });
             }

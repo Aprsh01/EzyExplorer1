@@ -19,6 +19,7 @@ import destinationRoutes from "./routes/destinationRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 import expenseRoutes from "./routes/expenseRoutes.js";
 import plannedVisitRoutes from "./routes/plannedVisitRoutes.js";
+import buddyBookingRoutes from "./routes/buddyBookingRoutes.js";
 
 // Middleware
 import { requestLogger, analyticsLogger, getApiStats } from "./middleware/logger.js";
@@ -66,6 +67,7 @@ app.use("/api/destinations", destinationRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/expenses", expenseRoutes);
 app.use("/api/planned-visits", plannedVisitRoutes);
+app.use("/api/buddy-bookings", buddyBookingRoutes);
 
 // Analytics endpoint
 app.get("/api/stats", getApiStats);

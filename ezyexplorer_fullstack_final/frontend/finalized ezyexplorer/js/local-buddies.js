@@ -144,6 +144,23 @@
     const button = event.target.closest('.btn-book-buddy');
     const originalText = button.innerHTML;
     
+    // Check if user is logged in (check both 'token' and 'authToken' for compatibility)
+    const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+    console.log('Token check:', token ? 'Token exists' : 'No token found');
+    
+    if (!token || token === 'null' || token === 'undefined') {
+      // Show login prompt
+      console.log('User not logged in, showing login prompt');
+      showNotificationPopup(
+        'Login Required',
+        'Please login to book a buddy for your trip.',
+        'info'
+      );
+      return;
+    }
+    
+    console.log('User is logged in, proceeding with booking...');
+    
     try {
       // Find buddy data
       const buddy = localBuddies.find(b => b.name === buddyName);
@@ -165,26 +182,36 @@
         
         // Show success message
         showNotificationPopup(
-          'Booking Request Sent!',
-          `Your booking request for <strong>${buddyName}</strong> has been sent successfully.<br><br>You will be contacted shortly to confirm your trip details.`,
-          'info'
+          'Booking Confirmed!',
+          `Your buddy <strong>${buddyName}</strong> has been booked successfully!<br><br>You will be contacted shortly to confirm your trip details.`,
+          'success'
         );
       } else {
         // Fallback if API is not available
         console.warn('API not available, showing notification only');
         showNotificationPopup(
-          'Booking Request Sent!',
-          `Your booking request for <strong>${buddyName}</strong> has been sent successfully.<br><br>You will be contacted shortly to confirm your trip details.`,
-          'info'
+          'Booking Confirmed!',
+          `Your buddy <strong>${buddyName}</strong> has been booked successfully!<br><br>You will be contacted shortly to confirm your trip details.`,
+          'success'
         );
       }
     } catch (error) {
       console.error('Error booking buddy:', error);
-      showNotificationPopup(
-        'Booking Failed',
-        'There was an error processing your booking. Please try again.',
-        'error'
-      );
+      
+      // Check if error is due to authentication
+      if (error.message && error.message.includes('login')) {
+        showNotificationPopup(
+          'Login Required',
+          'Please login to book a buddy for your trip.',
+          'info'
+        );
+      } else {
+        showNotificationPopup(
+          'Booking Failed',
+          'There was an error processing your booking. Please try again.',
+          'error'
+        );
+      }
     } finally {
       // Re-enable button
       button.disabled = false;
