@@ -148,12 +148,10 @@ class CommentsManager {
   }
 
   deleteComment(id) {
-    if (confirm('Are you sure you want to delete this comment?')) {
-      this.comments = this.comments.filter(comment => comment.id !== id);
-      this.saveComments();
-      this.renderComments();
-      this.showNotification('Comment deleted successfully!', 'success');
-    }
+    this.comments = this.comments.filter(comment => comment.id !== id);
+    this.saveComments();
+    this.renderComments();
+    this.showNotification('Comment deleted successfully!', 'success');
   }
 
   renderComments() {
