@@ -53,6 +53,9 @@ app.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 100 }));
 const frontendPath = path.join(__dirname, "../frontend/finalized ezyexplorer");
 app.use(express.static(frontendPath));
 
+// Also serve views directory for any assets
+app.use(express.static(path.join(__dirname, 'views')));
+
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/explore", exploreRoutes);
