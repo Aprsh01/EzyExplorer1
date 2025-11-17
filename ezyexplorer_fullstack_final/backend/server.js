@@ -124,6 +124,7 @@ app.get("*", (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
+// port changed to 9000 from 3000 
 const PORT = process.env.PORT || 9000;
 app.listen(PORT, () => {
   console.log(`\n🚀 Server running on port ${PORT}`);

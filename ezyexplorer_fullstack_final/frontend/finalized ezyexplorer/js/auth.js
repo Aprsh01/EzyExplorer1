@@ -539,19 +539,19 @@ class AuthManager {
         this.showSuccessMessage('Wishlist section coming soon!');
     }
     
-    handleLogout() {
-        // Close popup
-        const popup = document.querySelector('.logout-popup');
-        if (popup) popup.remove();
+    // handleLogout() {
+    //     // Close popup
+    //     const popup = document.querySelector('.logout-popup');
+    //     if (popup) popup.remove();
         
-        // Clear stored data
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userData');
-        localStorage.removeItem('rememberMe');
+    //     // Clear stored data
+    //     localStorage.removeItem('authToken');
+    //     localStorage.removeItem('userData');
+    //     localStorage.removeItem('rememberMe');
         
-        // Update UI
-        this.updateLoginButton(false);
-    }
+    //     // Update UI
+    //     this.updateLoginButton(false);
+    // }
 }
 
 // Initialize when DOM is loaded

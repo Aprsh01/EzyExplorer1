@@ -80,7 +80,7 @@ export const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        error: "Invalid email or password"
+        error: "Invalid password"
       });
     }
 
