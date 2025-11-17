@@ -3,7 +3,6 @@ import {
   register,
   login,
   getCurrentUser,
-  changePassword,
   logout,
   verifyToken
 } from "../controllers/authController.js";
@@ -17,6 +16,5 @@ router.post("/logout", logout);
 
 // Protected routes
 router.get("/me", verifyToken, getCurrentUser);
-router.post("/change-password", verifyToken, changePassword);
 
 export default router;

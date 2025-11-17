@@ -7,13 +7,10 @@ import connectDB from "./config/db.js";
 
 // Routes
 import exploreRoutes from "./routes/exploreRoutes.js";
-import visitRoutes from "./routes/visitRoutes.js";
 import buddyRoutes from "./routes/buddyRoutes.js";
-import wishlistRoutes from "./routes/wishlistRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
-import notificationRoutes from "./routes/notificationRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import destinationRoutes from "./routes/destinationRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
@@ -59,13 +56,10 @@ app.use(express.static(path.join(__dirname, 'views')));
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/explore", exploreRoutes);
-app.use("/api/visit", visitRoutes);
 app.use("/api/buddies", buddyRoutes);
-app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/bookings", bookingRoutes);
-app.use("/api/notifications", notificationRoutes);
 app.use("/api/destinations", destinationRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/expenses", expenseRoutes);
